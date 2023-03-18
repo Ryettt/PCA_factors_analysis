@@ -23,6 +23,12 @@ class Data_processing:
         self.stockspath = self.path + stock_dir
 
     def process_features_data(self, group_path, group_num):
+        '''
+
+        :param group_path: output store path
+        :param group_num: divided into group_num groups by feature values
+        :return:
+        '''
         filelist = os.listdir(self.featurespath)
         for filename in filelist:
             partlist = filename.split(".")
@@ -43,7 +49,7 @@ class Data_processing:
 
         :param features_data: Dataframe with index ['Date', 'Ticker']
         :param group_num: divided into group_num groups
-        :return: Dataframe with group labels every Trading_date
+        :return: Dataframe with group labels every trading date
         '''
 
         features_data_stack = features_data.stack().reset_index().set_index('Date')
@@ -52,17 +58,16 @@ class Data_processing:
         # add group labels
         sort_data['group'] = (sort_data.groupby(['Date', 'features']).apply(
             lambda x: pd.qcut(x['values'], group_num, labels = range(group_num)))).values
-        self.sort_data = sort_data
 
-        return self.sort_data
+        return sort_data
 
     def get_responding_future_date(self, group_path, future_days_path, future_days, filelist):
-
         '''
+        get futures trading dates
 
-        :param
-        :future_days: number of future days from T+2
-        :filelist:the file name list under group_path
+        :param future_days_path: output store path
+        :param future_days: of future days from T+2
+        :param filelist:the file name list under group_path
         '''
 
         trading_date = (pd.read_csv(self.trading_date_path + "TradeDate.csv")).astype('str')
